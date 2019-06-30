@@ -2,7 +2,6 @@ package aplicacion.contactos.com.autoarenavision;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -49,13 +48,14 @@ public class leerUrl {
      * coincidencias de un texto especificado.
      *
      * @param url
+     * @param enlacesWebCadenas
+     * @param programacionArenavisions
      * @param texto1
      * @param texto2
      * @param texto3
      * @return
      */
-    public ArrayList<EnlacesWebCadenas> buscarTextoPagina(String url, String texto1, String texto2, String texto3, String texto4) {
-        ArrayList<EnlacesWebCadenas> enlacesWebCadenas = new ArrayList<>();
+    public void buscarTextoPagina(String url, ArrayList<EnlacesWebCadenas> enlacesWebCadenas, ArrayList<ProgramacionArenavision> programacionArenavisions, String texto1, String texto2, String texto3, String texto4) {
         StringBuffer resultado = new StringBuffer();
 
 
@@ -67,7 +67,8 @@ public class leerUrl {
             // Creamos el objeto con el que vamos a leer
             BufferedReader lector = new BufferedReader(new InputStreamReader(
                     uc.getInputStream(), "UTF-8"));
-            int contando =0;
+            int contando = 0;
+            String programas[] = new String[7];
             String linea = "";
 
 
@@ -95,22 +96,90 @@ public class leerUrl {
                 }
 
                 if (linea.contains(texto3) || linea.contains(texto4)){
-                    contando++;
+
                     linea = linea.replace("</tr><tr><td class=\"auto-style3\">", "");
                     linea = linea.replace("<td class=\"auto-style3\">", "");
                     linea = linea.replace("</td>", "");
-                    //linea = linea.replace("<br />" ,"");
+                    linea = linea.replace("<br />" ,"");
 
-                    if (contando==4){
+                    contando = contando % 6;
+                    programas[contando] = linea;
 
-                        contando=0;}
-                    System.out.println(linea);
+
+
+                    //System.out.println(contando + "- " + linea);
+
+                    if (contando==5){
+
+                        String[] idioma = programas[5].split(" ");
+                        programacionArenavisions.add(new ProgramacionArenavision(
+                                programas[0],
+                                programas[1],
+                                programas[2],
+                                programas[3],
+                                programas[4],
+                                idioma[0],
+                                idioma[1]) // todo corregir para dos o mas idiomas
+                        );
+
+                        }
+                    contando++;
+
+
 
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return enlacesWebCadenas;
     }
+
+
+
+
+
+
+
+    public void buscarTextoPaginaDos(String url, ArrayList<EnlacesWebCadenas> enlacesWebCadenas, int pos) {
+        StringBuffer resultado = new StringBuffer();
+
+
+        try {
+            URL pagina = new URL(url);
+            URLConnection uc = pagina.openConnection();
+            uc.connect();
+
+            // Creamos el objeto con el que vamos a leer
+            BufferedReader lector = new BufferedReader(new InputStreamReader(
+                    uc.getInputStream(), "UTF-8"));
+            int contando = 0;
+            String programas[] = new String[7];
+            String linea = "";
+
+
+
+            while ((linea = lector.readLine()) != null) {
+
+
+                //para las cadenas
+                if (linea.contains("acestream://")) {
+
+                    linea = linea.substring(48,100);  // todo para recortar el texto y dejar solo el acestream enlace
+                    System.out.println(linea);
+                    enlacesWebCadenas.get(pos).setEnlaceAce(linea);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+
+
+
+
 }
