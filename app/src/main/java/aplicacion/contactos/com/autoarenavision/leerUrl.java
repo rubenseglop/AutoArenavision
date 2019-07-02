@@ -135,11 +135,12 @@ public class leerUrl {
     }
 
 
-
-
-
-
-
+    /**
+     * Método chungo
+     * @param url Url de la pagina a leer
+     * @param enlacesWebCadenas Objeto que le paso para almacenar el valor
+     * @param pos Numero de objeto (su posicion)
+     */
     public void buscarTextoPaginaDos(String url, ArrayList<EnlacesWebCadenas> enlacesWebCadenas, int pos) {
         StringBuffer resultado = new StringBuffer();
 
